@@ -69,6 +69,34 @@ docker compose up -d
 
 **Note: When performing the setup, the Database host is ```mysql```
 
+### On-demand Backups
+
+You can trigger a backup on demand using the backup container:
+
+```bash
+docker compose -f debian/docker-compose.yml exec db-backup backup-now
+```
+
+This will run all configured backup jobs immediately and place the resulting files in `debian/backups`. To follow progress or debug, stream the container logs:
+
+```bash
+docker compose -f debian/docker-compose.yml logs -f db-backup
+```
+
+If you prefer to run a single job (for example the first job) you can exec the job-specific command:
+
+```bash
+docker compose -f debian/docker-compose.yml exec db-backup backup01-now
+```
+
+### Database Web UI (phpMyAdmin)
+
+A phpMyAdmin service is included for database management. By default it is exposed on port `8081`. Access it at:
+
+http://localhost:8081
+
+Use your MySQL credentials from the `.env` file (for example the `DB_USERNAME` and `DB_PASSWORD`, or `root` with `DB_ROOT_PASSWORD`).
+
 ### Updating the Image
 
 To upgrade to a newer release image, update your docker-compose.yml first by running:
@@ -89,6 +117,6 @@ If you discover a bug, please create an issue. For general queries, visit our [F
 
 This is a new image which should provide much better support for all users, however there are some items left to complete
 
-- [ ] Backup script  
+- [x] Backup script  
 - [ ] Integrate soketi server  
-- [ ] Add elastic search for site wide search  
+- [ ] Add elastic search for site wide search

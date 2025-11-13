@@ -12,3 +12,4 @@ charts/**/charts/
 
 # Compose filesystem
 /docker
+/**/backups

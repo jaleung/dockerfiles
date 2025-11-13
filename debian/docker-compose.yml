@@ -61,6 +61,39 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
 
+  phpmyadmin:
+    image: phpmyadmin
+    restart: unless-stopped
+    ports:
+      - 8081:80
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  db-backup:
+    image: tiredofit/db-backup
+    restart: unless-stopped
+    volumes:
+      - ./backups:/backup
+    environment:
+      DB01_TYPE: mysql
+      DB01_HOST: mysql
+      DB01_NAME: ${DB_DATABASE}
+      DB01_USER: ${DB_USERNAME}
+      DB01_PASS: ${DB_PASSWORD}
+      DB01_BACKUP_LOCATION: FILESYSTEM
+      DB01_BACKUP_INTERVAL: 1440
+      DB01_BACKUP_BEGIN: "0 0 * * *"
+      DB01_CLEANUP_TIME: 8640
+      DB01_COMPRESSION: GZ
+      DB01_GZ_RSYNCABLE: "TRUE"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 volumes:
   app_public:
     driver: local
@@ -69,4 +102,6 @@ volumes:
   mysql_data:
     driver: local
   redis_data:
+    driver: local
+  backups:
     driver: local
